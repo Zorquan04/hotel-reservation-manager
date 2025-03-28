@@ -1,0 +1,12 @@
+version: '3.8'
+services:
+  db:
+    image: postgres
+    container_name: reservation_manager
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: kapi2000
+      POSTGRES_DB: reservation_manager
+    ports:
+      - "5432:5432"
