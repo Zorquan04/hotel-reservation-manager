@@ -15,17 +15,11 @@ import java.util.Optional;
 public class ReservationService {
     private final ReservationRepository reservationRepository;
 
-    public Reservation createReservation(Reservation reservation) {
-        return reservationRepository.save(reservation);
-    }
+    public Reservation createReservation(Reservation reservation) { return reservationRepository.save(reservation);}
 
-    public List<Reservation> getUserReservations(User user) {
-        return reservationRepository.findByUser(user);
-    }
+    public List<Reservation> getUserReservations(User user) { return reservationRepository.findByUser(user);}
 
-    public List<Reservation> getReservationsByDate(LocalDate date) {
-        return reservationRepository.findByDate(date);
-    }
+    public List<Reservation> getReservationsByDate(LocalDate date) { return reservationRepository.findByDate(date); }
 
     public Optional<Reservation> getReservationById(Long id) { return reservationRepository.findById(id); }
 

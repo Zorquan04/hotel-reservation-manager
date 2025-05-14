@@ -23,17 +23,14 @@ import static org.springframework.security.web.util.matcher.AntPathRequestMatche
 public class SecurityConfig {
     @Bean
     public UserDetailsService userDetailsService(@Lazy UserService userService) {
-        return username -> userService
-                .findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        return username -> userService.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() { return new BCryptPasswordEncoder(); }
 
     @Bean
-    public AuthenticationManager authenticationManager(UserDetailsService userDetailsService,
-                                                       PasswordEncoder passwordEncoder) {
+    public AuthenticationManager authenticationManager(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         provider.setUserDetailsService(userDetailsService);
         provider.setPasswordEncoder(passwordEncoder);
@@ -42,15 +39,12 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth
+        http.csrf(AbstractHttpConfigurer::disable).authorizeHttpRequests(auth -> auth
                         .requestMatchers(antMatcher("/api/users/register"), antMatcher("/api/auth/login")).permitAll()
                         .requestMatchers(antMatcher("/api/rooms")).hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .httpBasic(withDefaults());
-
         return http.build();
     }
 }
