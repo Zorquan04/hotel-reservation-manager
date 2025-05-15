@@ -5,6 +5,7 @@ import org.example.hotelreservation.dto.UserRequestDTO;
 import org.example.hotelreservation.dto.UserResponseDTO;
 import org.example.hotelreservation.dto.UserSummaryDTO;
 import org.example.hotelreservation.entity.User;
+import org.example.hotelreservation.repository.ReservationRepository;
 import org.example.hotelreservation.repository.UserRepository;
 import org.example.hotelreservation.util.UserMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final ReservationRepository reservationRepository;
     private final PasswordEncoder passwordEncoder;
 
     public User registerUser(User user) {
@@ -56,12 +58,11 @@ public class UserService {
         return UserMapper.toResponse(u);
     }
 
-    public User updateUser(Long id, User userDetails) {
-        return userRepository.findById(id).map(user -> {
-            user.setUsername(userDetails.getUsername());
-            user.setPassword(passwordEncoder.encode(userDetails.getPassword()));
-            return userRepository.save(user);
-        }).orElseThrow(() -> new RuntimeException("User not found"));
+    public UserResponseDTO updateUser(Long id, UserRequestDTO dto) {
+        User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+        UserMapper.updateEntity(user, dto, reservationRepository, passwordEncoder);
+        User saved = userRepository.save(user);
+        return UserMapper.toResponse(saved);
     }
 
     public void deleteUser(Long id) { userRepository.deleteById(id); }

@@ -24,7 +24,19 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Tag(name = "Users", description = "User registration and management")
 public class UserController {
+
     private final UserService userService;
+
+    private boolean isAdmin(Authentication auth) {
+        return auth.getAuthorities().stream().anyMatch(ga -> ga.getAuthority().equals("ROLE_ADMIN"));
+    }
+
+    private Long getCurrentUserId(Authentication auth) {
+        return userService.findByUsername(auth.getName()).map(User::getId).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Current user not found"));
+    }
+
+    private boolean isSelf(Authentication auth, Long id) { return getCurrentUserId(auth).equals(id); }
 
     @PostMapping("/register")
     @Operation(summary = "Register a new user")
@@ -38,15 +50,11 @@ public class UserController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Get user by ID")
-    public ResponseEntity<?> getUserById(@PathVariable Long id, Authentication auth) {
-        boolean isAdmin = auth.getAuthorities().stream().anyMatch(ga -> ga.getAuthority().equals("ROLE_ADMIN"));
-
-        if (isAdmin) { return ResponseEntity.ok(userService.getUserDTOById(id)); }
-
-        String currentUsername = auth.getName();
-        if (userService.findByUsername(currentUsername).map(User::getId).filter(myId -> myId.equals(id)).isPresent()) {
-            return ResponseEntity.ok(userService.getUserDTOById(id));
-        }
+    public ResponseEntity<?> getUserById(
+            @Parameter(description = "ID of the user to retrieve") @PathVariable Long id,
+            @Parameter(hidden = true) Authentication auth
+    ) {
+        if (isAdmin(auth) || isSelf(auth, id)) { return ResponseEntity.ok(userService.getUserDTOById(id)); }
 
         return ResponseEntity.ok(userService.getAllUsersSummary()
                 .stream()
@@ -57,43 +65,47 @@ public class UserController {
 
     @GetMapping("/username/{username}")
     @Operation(summary = "Find user by username", description = "Returns either full DTO (admin or self) or summary")
-    public ResponseEntity<?> findByUsername(@PathVariable String username, Authentication auth) {
-        boolean isAdmin = auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
-        String current = auth.getName();
+    public ResponseEntity<?> findByUsername(
+            @Parameter(description = "Username of the user to find") @PathVariable String username,
+            @Parameter(hidden = true) Authentication auth
+    ) {
+        boolean isSelf = auth.getName().equals(username);
 
-        if (isAdmin || current.equals(username)) {
-            return ResponseEntity.ok(userService.getUserDtoByUsername(username));
-        } else {
-            return ResponseEntity.ok(userService.getUserSummaryByUsername(username));
-        }
+        if (isAdmin(auth) || isSelf) { return ResponseEntity.ok(userService.getUserDtoByUsername(username)); }
+
+        return ResponseEntity.ok(userService.getUserSummaryByUsername(username));
     }
 
     @GetMapping
     @Operation(summary = "List users")
-    public ResponseEntity<?> listUsers(Authentication auth) {
-        boolean isAdmin = auth.getAuthorities().stream().anyMatch(ga -> ga.getAuthority().equals("ROLE_ADMIN"));
-        if (isAdmin) {
+    public ResponseEntity<?> listUsers(@Parameter(hidden = true) Authentication auth) {
+        if (isAdmin(auth)) {
             List<UserResponseDTO> all = userService.getAllUsers().stream().map(UserMapper::toResponse).collect(Collectors.toList());
             return ResponseEntity.ok(all);
-        } else {
-            return ResponseEntity.ok(userService.getAllUsersSummary());
         }
+        return ResponseEntity.ok(userService.getAllUsersSummary());
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Update user", description = "Updates user information")
-    public ResponseEntity<User> updateUser(
-            @Parameter(description = "User ID") @PathVariable Long id,
-            @Parameter(description = "Updated user data") @RequestBody User user
+    public ResponseEntity<UserResponseDTO> updateUser(
+            @Parameter(description = "ID of the user to update") @PathVariable Long id,
+            @Parameter(description = "Updated user data") @Valid @RequestBody UserRequestDTO dto,
+            @Parameter(hidden = true) Authentication auth
     ) {
-        return ResponseEntity.ok(userService.updateUser(id, user));
+        if (!isAdmin(auth) && !isSelf(auth, id)) { throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied"); }
+        UserResponseDTO updated = userService.updateUser(id, dto);
+        return ResponseEntity.ok(updated);
     }
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete user", description = "Deletes a user by ID")
     public ResponseEntity<Void> deleteUser(
-            @Parameter(description = "User ID") @PathVariable Long id
+            @Parameter(description = "ID of the user to delete") @PathVariable Long id,
+            @Parameter(hidden = true) Authentication auth
     ) {
+        if (!isAdmin(auth) && !isSelf(auth, id)) { throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied"); }
+
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }

@@ -4,10 +4,25 @@ import org.example.hotelreservation.dto.*;
 import org.example.hotelreservation.entity.Reservation;
 import org.example.hotelreservation.entity.Role;
 import org.example.hotelreservation.entity.User;
+import org.example.hotelreservation.repository.ReservationRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class UserMapper {
+
+    public static void updateEntity(User user, UserRequestDTO dto, ReservationRepository reservationRepo, PasswordEncoder encoder) {
+        user.setUsername(dto.getUsername());
+        user.setPassword(encoder.encode(dto.getPassword()));
+        user.setRole(Role.valueOf(dto.getRole()));
+
+        if (dto.getReservations() != null) {
+            List<Reservation> resList = dto.getReservations().stream().map(id -> reservationRepo.findById(id).orElseThrow(() ->
+                            new RuntimeException("Reservation not found: " + id))).collect(Collectors.toList());
+            user.setReservations(resList);
+        }
+    }
 
     public static User toEntity(UserRequestDTO dto) {
         User u = new User();
@@ -27,7 +42,5 @@ public class UserMapper {
         return r;
     }
 
-    public static UserSummaryDTO toSummary(User user) {
-        return new UserSummaryDTO(user.getId(), user.getUsername());
-    }
+    public static UserSummaryDTO toSummary(User user) { return new UserSummaryDTO(user.getId(), user.getUsername()); }
 }
