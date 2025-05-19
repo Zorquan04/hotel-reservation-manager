@@ -41,8 +41,15 @@ public class UserController {
     @PostMapping("/register")
     @Operation(summary = "Register a new user")
     public ResponseEntity<UserResponseDTO> registerUser(
-            @Parameter(description = "User data to register") @Valid @RequestBody UserRequestDTO dto
+            @Parameter(description = "User data to register") @Valid @RequestBody UserRequestDTO dto,
+            @Parameter(hidden = true) Authentication auth
     ) {
+        if (auth != null && auth.isAuthenticated() && auth.getAuthorities().stream().anyMatch(a ->
+                a.getAuthority().equals("ROLE_USER"))
+        ) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only anonymous or ADMIN may register new users");
+        }
+
         dto.setRole("USER");
         UserResponseDTO created = userService.createUser(dto);
         return ResponseEntity.ok(created);
@@ -93,7 +100,15 @@ public class UserController {
             @Parameter(description = "Updated user data") @Valid @RequestBody UserRequestDTO dto,
             @Parameter(hidden = true) Authentication auth
     ) {
-        if (!isAdmin(auth) && !isSelf(auth, id)) { throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied"); }
+        boolean admin = isAdmin(auth);
+        Long currentId = getCurrentUserId(auth);
+
+        if (!admin && !currentId.equals(id)) { throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied"); }
+
+        if (!admin) {
+            String originalRole = userService.getUserDTOById(id).getRole();
+            dto.setRole(originalRole);
+        }
         UserResponseDTO updated = userService.updateUser(id, dto);
         return ResponseEntity.ok(updated);
     }
@@ -104,7 +119,9 @@ public class UserController {
             @Parameter(description = "ID of the user to delete") @PathVariable Long id,
             @Parameter(hidden = true) Authentication auth
     ) {
-        if (!isAdmin(auth) && !isSelf(auth, id)) { throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied"); }
+        if (!isAdmin(auth)) { throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied"); }
+
+        if (getCurrentUserId(auth).equals(id)) { throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You cannot delete your own account"); }
 
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();

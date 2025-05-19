@@ -1,5 +1,6 @@
 package org.example.hotelreservation.entity;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -33,5 +34,6 @@ public class User implements UserDetails {
     private List<Reservation> reservations = new ArrayList<>();
 
     @Override
+    @Hidden
     public Collection<? extends GrantedAuthority> getAuthorities() { return List.of(() -> "ROLE_" + role.name()); }
 }

@@ -6,8 +6,10 @@ import lombok.*;
 
 import java.util.List;
 
-@Getter @Setter
-@NoArgsConstructor @AllArgsConstructor
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserRequestDTO {
     @NotBlank(message = "Username is required")
     private String username;

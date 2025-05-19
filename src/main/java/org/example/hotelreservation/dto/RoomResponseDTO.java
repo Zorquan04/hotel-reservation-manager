@@ -6,7 +6,9 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserSummaryDTO {
+public class RoomResponseDTO {
     private Long id;
-    private String username;
+    private String number;
+    private String standard;
+    private double price;
 }
