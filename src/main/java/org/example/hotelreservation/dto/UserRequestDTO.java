@@ -4,8 +4,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
-import java.util.List;
-
 @Getter
 @Setter
 @NoArgsConstructor
@@ -18,6 +16,4 @@ public class UserRequestDTO {
     private String password;
 
     private String role;
-
-    private List<Long> reservations;
 }

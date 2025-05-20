@@ -5,7 +5,6 @@ import org.example.hotelreservation.dto.UserRequestDTO;
 import org.example.hotelreservation.dto.UserResponseDTO;
 import org.example.hotelreservation.dto.UserSummaryDTO;
 import org.example.hotelreservation.entity.User;
-import org.example.hotelreservation.repository.ReservationRepository;
 import org.example.hotelreservation.repository.UserRepository;
 import org.example.hotelreservation.util.UserMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,7 +18,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
-    private final ReservationRepository reservationRepository;
     private final PasswordEncoder passwordEncoder;
 
     public User registerUser(User user) {
@@ -60,7 +58,7 @@ public class UserService {
 
     public UserResponseDTO updateUser(Long id, UserRequestDTO dto) {
         User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
-        UserMapper.updateEntity(user, dto, reservationRepository, passwordEncoder);
+        UserMapper.updateEntity(user, dto, passwordEncoder);
         User saved = userRepository.save(user);
         return UserMapper.toResponse(saved);
     }
