@@ -43,15 +43,15 @@ public class SecurityConfig {
         http.csrf(AbstractHttpConfigurer::disable).authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/users/register", "/api/auth/login").permitAll()
 
-                        .requestMatchers(HttpMethod.GET,    "/api/rooms", "/api/rooms/**").authenticated()
-                        .requestMatchers(HttpMethod.POST,   "/api/rooms/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT,    "/api/rooms/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/rooms/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET,"/api/rooms", "/api/rooms/**").authenticated()
+                        .requestMatchers(HttpMethod.POST,"/api/rooms/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT,"/api/rooms/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE,"/api/rooms/**").hasRole("ADMIN")
 
-                        .requestMatchers(HttpMethod.GET,    "/api/reservations", "/api/reservations/**").authenticated()
-                        .requestMatchers(HttpMethod.POST,   "/api/reservations/**").authenticated()
-                        .requestMatchers(HttpMethod.PUT,    "/api/reservations/**").authenticated()
-                        .requestMatchers(HttpMethod.DELETE, "/api/reservations/**").authenticated()
+                        .requestMatchers(HttpMethod.GET,"/api/reservations", "/api/reservations/**").authenticated()
+                        .requestMatchers(HttpMethod.POST,"/api/reservations/**").authenticated()
+                        .requestMatchers(HttpMethod.PUT,"/api/reservations/**").authenticated()
+                        .requestMatchers(HttpMethod.DELETE,"/api/reservations/**").authenticated()
 
                         .anyRequest().authenticated()
                 )

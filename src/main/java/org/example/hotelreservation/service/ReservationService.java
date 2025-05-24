@@ -21,6 +21,9 @@ public class ReservationService {
     private final RoomRepository roomRepository;
 
     public ReservationResponseDTO createReservation(ReservationRequestDTO dto) {
+        if (reservationRepository.existsByRoomIdAndDate(dto.getRoomId(), dto.getDate())) {
+            throw new RuntimeException("Room is already booked on this date.");
+        }
         Reservation r = ReservationMapper.toEntity(dto, userRepository, roomRepository);
         Reservation saved = reservationRepository.save(r);
         return ReservationMapper.toResponse(saved);
@@ -55,6 +58,14 @@ public class ReservationService {
 
     public ReservationResponseDTO updateReservation(Long id, ReservationRequestDTO dto) {
         Reservation existing = reservationRepository.findById(id).orElseThrow(() -> new RuntimeException("Reservation not found: " + id));
+
+        boolean isRoomOrDateChanged = !existing.getRoom().getId().equals(dto.getRoomId()) || !existing.getDate().equals(dto.getDate());
+
+        if (isRoomOrDateChanged) {
+            boolean conflict = reservationRepository.existsByRoomIdAndDate(dto.getRoomId(), dto.getDate());
+            if (conflict) { throw new RuntimeException("Room is already booked on this date."); }
+        }
+
         ReservationMapper.updateEntity(existing, dto, userRepository, roomRepository);
         Reservation saved = reservationRepository.save(existing);
         return ReservationMapper.toResponse(saved);
