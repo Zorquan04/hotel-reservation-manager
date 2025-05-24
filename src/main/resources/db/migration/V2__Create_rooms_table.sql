@@ -1,11 +1,11 @@
 DO $$
 BEGIN
-    IF NOT EXISTS (SELECT 1 FROM pg_tables WHERE tablename = 'users') THEN
-        CREATE TABLE users (
+    IF NOT EXISTS (SELECT 1 FROM pg_tables WHERE tablename = 'rooms') THEN
+        CREATE TABLE rooms (
             id SERIAL PRIMARY KEY,
-            username VARCHAR(50) UNIQUE NOT NULL,
-            password VARCHAR(100) NOT NULL,
-            role VARCHAR(10) NOT NULL
+            number VARCHAR(50) UNIQUE NOT NULL,
+            price DOUBLE PRECISION NOT NULL,
+            standard VARCHAR(255) NOT NULL
         );
     END IF;
 END $$;
