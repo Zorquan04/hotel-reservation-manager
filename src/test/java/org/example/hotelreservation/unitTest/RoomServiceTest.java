@@ -77,4 +77,45 @@ class RoomServiceTest {
         when(roomRepo.existsById(10L)).thenReturn(false);
         assertThrows(RuntimeException.class, () -> roomService.deleteRoom(10L));
     }
+
+    @Test @DisplayName("getRoomDtoById – returns dto if found")
+    void testGetRoomDtoById_found() {
+        Room room = new Room();
+        room.setId(3L);
+        room.setNumber("202");
+        room.setStandard("Deluxe");
+        room.setPrice(150);
+
+        when(roomRepo.findById(3L)).thenReturn(Optional.of(room));
+
+        RoomResponseDTO dto = roomService.getRoomDtoById(3L);
+
+        assertEquals(3L, dto.getId());
+        assertEquals("202", dto.getNumber());
+        assertEquals("Deluxe", dto.getStandard());
+        assertEquals(150, dto.getPrice());
+    }
+
+    @Test @DisplayName("getAllRoomsDto returns all rooms as DTOs")
+    void testGetAllRoomsDto() {
+        Room room1 = new Room();
+        room1.setId(1L);
+        room1.setNumber("101");
+        room1.setStandard("Standard");
+        room1.setPrice(100);
+
+        Room room2 = new Room();
+        room2.setId(2L);
+        room2.setNumber("102");
+        room2.setStandard("Deluxe");
+        room2.setPrice(200);
+
+        when(roomRepo.findAll()).thenReturn(List.of(room1, room2));
+
+        List<RoomResponseDTO> dtos = roomService.getAllRoomsDto();
+
+        assertEquals(2, dtos.size());
+        assertEquals("101", dtos.get(0).getNumber());
+        assertEquals("102", dtos.get(1).getNumber());
+    }
 }
