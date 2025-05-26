@@ -27,19 +27,19 @@ docker-compose up
 Go to: http://localhost:8080/swagger-ui/index.html#/
 
 Then you have to log in - by default, there are two accounts:  
-usename: admin, password: admin123  
-username: user, password: user123
+- usename: admin, password: admin123  
+- username: user, password: user123
 
 ## 4. How tu use:
 
 For now you should have something like this:
-![img.png](img.png)
+![img.png](images/img.png)
 
 For example to create a new room (as admin), you can use the following request:
-![img_1.png](img_1.png)
+![img_1.png](images/img_1.png)
 
 To delete:
-![img_2.png](img_2.png)
+![img_2.png](images/img_2.png)
 
 Any other requests can be done **in a similar way**, just check the Swagger UI.
 
@@ -49,19 +49,19 @@ Any other requests can be done **in a similar way**, just check the Swagger UI.
 
 
 2. **Docker** - the application is containerized using Docker and Docker Compose ✅  
-[Zobacz docker-compose.yml](docker-compose.yml)  
-[Zobacz Dockerfile](Dockerfile)
+[See docker-compose.yml](docker-compose.yml)  
+[See Dockerfile](Dockerfile)
 
 
 3. **Maven** - the project is built using Maven ✅  
-[Zobacz pom.xml](pom.xml)
+[See pom.xml](pom.xml)
 
 
 4. **Framework Spring** - the application is built using Spring Boot ✅  
-![img_3.png](img_3.png)  
+![img_3.png](images/img_3.png)  
 Spring Security is used for authentication and authorization.
 
-![img_4.png](img_4.png)
+![img_4.png](images/img_4.png)
 Like you can see above, the application verifies if the user is an admin or a regular user and allows them to perform certain actions.
 
 
@@ -69,14 +69,14 @@ Like you can see above, the application verifies if the user is an admin or a re
 
 
 6. **Hibernate + SQL** - there is a database with tables for users, rooms, and reservations. The application uses Hibernate for ORM and SQL for data storage ✅
-![img_6.png](img_6.png)
-[Zobacz migration](src/main/resources/db/migration)
+![img_6.png](images/img_6.png)
+[See migration](src/main/resources/db/migration)
 
 
 7. **JUnit** - the application has unit tests for the main functionalities ✅  
-![img_7.png](img_7.png)
-[Zobacz testy jednostkowe](src/test/java/org/example/hotelreservation/unitTest)  
-[Zobacz testy integracyjne](src/test/java/org/example/hotelreservation/integrationTest)
+![img_7.png](images/img_7.png)
+[See unit tests](src/test/java/org/example/hotelreservation/unitTest)  
+[See integration test](src/test/java/org/example/hotelreservation/integrationTest)
 
 
-8. **Dokumentacja** - ✅
+8. **Documentation** - just ✅
