@@ -124,6 +124,6 @@ public class UserController {
         if (getCurrentUserId(auth).equals(id)) { throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You cannot delete your own account"); }
 
         userService.deleteUser(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().build();
     }
 }

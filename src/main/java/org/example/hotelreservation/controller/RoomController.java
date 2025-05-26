@@ -66,6 +66,6 @@ public class RoomController {
                                            @Parameter(hidden = true) Authentication auth) {
         if (isUnauthorized(auth)) { throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only ADMIN can delete rooms"); }
         roomService.deleteRoom(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().build();
     }
 }

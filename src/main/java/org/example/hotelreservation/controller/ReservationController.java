@@ -114,6 +114,6 @@ public class ReservationController {
         if (!isAdmin && !existing.getUserId().equals(currentUserId)) { throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied"); }
 
         reservationService.deleteReservation(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().build();
     }
 }
