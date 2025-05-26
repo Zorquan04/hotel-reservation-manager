@@ -39,7 +39,7 @@ public class UserController {
     private boolean isSelf(Authentication auth, Long id) { return getCurrentUserId(auth).equals(id); }
 
     @PostMapping("/register")
-    @Operation(summary = "Register a new user")
+    @Operation(summary = "Register a new user", description = "Allows anonymous or admin users to register a new user account.")
     public ResponseEntity<UserResponseDTO> registerUser(
             @Parameter(description = "User data to register") @Valid @RequestBody UserRequestDTO dto,
             @Parameter(hidden = true) Authentication auth
@@ -56,7 +56,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Get user by ID")
+    @Operation(summary = "Get user by ID", description = "Returns full user info if requester is ADMIN or the user themselves. Otherwise returns summary.")
     public ResponseEntity<?> getUserById(
             @Parameter(description = "ID of the user to retrieve") @PathVariable Long id,
             @Parameter(hidden = true) Authentication auth
@@ -84,7 +84,7 @@ public class UserController {
     }
 
     @GetMapping
-    @Operation(summary = "List users")
+    @Operation(summary = "List users", description = "Lists all users. Admins get full data, others only summaries.")
     public ResponseEntity<?> listUsers(@Parameter(hidden = true) Authentication auth) {
         if (isAdmin(auth)) {
             List<UserResponseDTO> all = userService.getAllUsers().stream().map(UserMapper::toResponse).collect(Collectors.toList());
